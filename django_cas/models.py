@@ -6,7 +6,6 @@ from six.moves.urllib.request import urlopen
 
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django_cas.exceptions import CasTicketException, CasConfigException
 # Ed Crewe - add in signals to delete old tickets

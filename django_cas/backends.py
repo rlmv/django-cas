@@ -7,8 +7,10 @@ from six.moves.urllib.request import urlopen
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django_cas.models import User, Tgt, PgtIOU
+from django_cas.models import Tgt, PgtIOU
 from django_cas.utils import cas_response_callbacks
+
+from user.models import DartmouthUserModel as User
 
 __all__ = ['CASBackend']
 
