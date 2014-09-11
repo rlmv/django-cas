@@ -1,10 +1,9 @@
 """CAS authentication backend"""
 
-#from urllib import urlencode, urlopen
-#from urlparse import urljoin
-from six.moves.urllib_parse import urlencode, urljoin
-from six.moves.urllib.request import urlopen
+from urllib.parse import urljoin
+from xml.etree import ElementTree
 
+import requests
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django_cas.models import Tgt
@@ -20,20 +19,14 @@ def verify(ticket, service):
 
     Returns username on success and None on failure.
     """
-
-    try:
-        from xml.etree import ElementTree
-    except ImportError:
-        from elementtree import ElementTree
-
     params = {'ticket': ticket, 'service': service}
 
-    url = (urljoin(settings.CAS_SERVER_URL, 'proxyValidate') + '?' +
-           urlencode(params))
+    # TODO: ensure that url uses https
+    url = urljoin(settings.CAS_SERVER_URL, 'serviceValidate')
+    r = requests.get(url, params=params)
 
-    page = urlopen(url)
     try:
-        response = page.read()
+        response = r.text
         tree = ElementTree.fromstring(response)
 
         #Useful for debugging
@@ -48,8 +41,8 @@ def verify(ticket, service):
             return tree[0][0].text
         else:
             return None
-    finally:
-        page.close()
+    except Exception as e:
+        raise e
 
 
 class CASBackend(object):
