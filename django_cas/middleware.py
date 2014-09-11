@@ -87,13 +87,3 @@ class CASMiddleware(object):
             return HttpResponseRedirect(request.path)
         else:
             return None
-
-class ProxyMiddleware(object):
-
-    # Middleware used to "fake" the django app that it lives at the Proxy Domain
-    def process_request(self, request):
-        proxy = getattr(settings, 'PROXY_DOMAIN', None)
-        if not proxy:
-            raise ImproperlyConfigured('To use Proxy Middleware you must set a PROXY_DOMAIN setting.')
-        else:
-            request.META['HTTP_HOST'] = proxy

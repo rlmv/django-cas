@@ -54,13 +54,6 @@ class Tgt(models.Model):
             page.close()
 
 
-class PgtIOU(models.Model):
-    """ Proxy granting ticket and IOU """
-    pgtIou = models.CharField(max_length=255, unique=True)
-    tgt = models.CharField(max_length=255)
-    created = models.DateTimeField(auto_now=True)
-
-
 def get_tgt_for(user):
     if not settings.CAS_PROXY_CALLBACK:
         raise CasConfigException("No proxy callback set in settings")
@@ -69,19 +62,6 @@ def get_tgt_for(user):
         return Tgt.objects.get(username=user.username)
     except ObjectDoesNotExist:
         raise CasTicketException("no ticket found for user " + user.username)
-
-
-def delete_old_tickets(**kwargs):
-    """ Delete tickets if they are over 2 days old 
-        kwargs = ['raw', 'signal', 'instance', 'sender', 'created']
-    """
-    sender = kwargs.get('sender', None)
-    now = datetime.now()
-    expire = datetime(now.year, now.month, now.day - 2)
-    sender.objects.filter(created__lt=expire).delete()
-
-post_save.connect(delete_old_tickets, sender=PgtIOU)
-#post_save.connect(delete_old_tickets, sender=Tgt)
 
 #Import CASBackend after Tgt and PgtIOU class declaration
 from django_cas.backends import CASBackend

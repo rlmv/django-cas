@@ -11,7 +11,6 @@ from operator import itemgetter
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django_cas.models import PgtIOU
 from django.contrib import messages
 
 from django_cas.models import SessionServiceTicket
@@ -185,25 +184,3 @@ def logout(request, next_page=None):
     else:
         return HttpResponseRedirect(next_page)
 
-
-def proxy_callback(request):
-    """Handles CAS 2.0+ XML-based proxy callback call.
-    Stores the proxy granting ticket in the database for
-    future use.
-
-    NB: Use created and set it in python in case database
-    has issues with setting up the default timestamp value
-    """
-    pgtIou = request.GET.get('pgtIou')
-    tgt = request.GET.get('pgtId')
-
-    if not (pgtIou and tgt):
-        return HttpResponse('No pgtIOO', mimetype="text/plain")
-    try:
-        PgtIOU.objects.create(tgt=tgt, pgtIou=pgtIou, created=datetime.now())
-        request.session['pgt-TICKET'] = ticket
-        return HttpResponse('PGT ticket is: %s' % str(ticket, mimetype="text/plain"))
-    except:
-        return HttpResponse('PGT storage failed for %s' % str(request.GET), mimetype="text/plain")
-
-    return HttpResponse('Success', mimetype="text/plain")
