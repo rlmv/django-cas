@@ -70,7 +70,7 @@ def _logout_url(request, next_page=None):
     return url
 
 
-def login(request, next_page=None, required=False, gateway=False):
+def login(request, next_page=None):
     """Forwards to CAS login URL or verifies CAS ticket"""
 
     if not next_page:
